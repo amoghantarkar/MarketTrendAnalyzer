@@ -255,7 +255,7 @@ trace3 = go.Scatter(
             color='rgb(214, 12, 140)'
         )
     )
-data = [trace1,trace2,trace4,  trace5]
+data = [trace1,trace2,trace4]
 layout = go.Layout(
         yaxis=dict(
             title='SuperTrend',
