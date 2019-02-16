@@ -1,4 +1,3 @@
-import DataUpdate
 import pandas as pd
 import plotly.plotly as py
 import plotly
@@ -12,6 +11,7 @@ import pandas as pd
 import pandas
 import xlsxwriter
 import plotly
+import quandl
 
 def EMA(df, base, target, period, alpha=False):
     """
@@ -280,10 +280,121 @@ app.layout = html.Div([html.Div(
 ),
 
     html.Div([
-        dcc.Graph(id='Supertrend',figure={'data':data,'layout':layout}),
+        html.Div(dcc.Input(id='input-box', type='text',value='NSE/NIFTY_50')),
+        html.Button('Submit', id='button'),
+        html.Div(id='container-button-basic',
+             children='Enter a value and press submit'),
+        dcc.Graph(id='SuperTrend',figure={'data':data,'layout':layout}),
     ],style={ 'width': '100%','float':'left','height':'800px'})
 
 ])
+
+@app.callback(
+    dash.dependencies.Output('SuperTrend', 'figure'),
+    [dash.dependencies.Input('input-box', 'value')])
+
+def update_fig(value):
+    data = quandl.get(value, api_key='fw44D_B2Rv3ZZV-ufqwJ', start_date='2018-01-01', end_date='2019-01-01')
+    data=data.iloc[1:]
+    data.reset_index()
+    data.rename(columns={data.columns[1]:'Date'})
+    data.drop(['Shares Traded', 'Turnover (Rs. Cr)'], inplace=True, axis=1)
+
+    print("These are API values")
+    print(data.head())
+    r = SuperTrend(data, 7, 3)
+    r = r.reset_index()
+    r = pd.melt(r, id_vars=['Date', 'STX_7_3'], var_name='Type', value_name='values')
+
+    #r = pd.melt(r, id_vars=['date', 'STX_7_3'], var_name='Type', value_name='values')
+    opt = ['Open', 'High', 'Low', 'Close']
+    data1 = r[r.Type.isin(opt)]
+    x = data1['Date']
+
+    trace1 = go.Box(
+        y=data1['values'],
+        x=x,
+        name='Price Range',
+        marker=dict(
+            color='#3D9970'
+        )
+    )
+
+    opt2 = ['ST_7_3']
+    data2 = r[r.Type.isin(opt2)]
+
+    data2 = data2.loc[data2['STX_7_3'] == 'up']
+    data2 = data2.drop_duplicates('Date')
+    print(data2.head())
+    trace2 = go.Scatter(
+        y=data2['values'],
+        x=data2['Date'],
+        mode='markers',
+        name='SuperTrend Low',
+        connectgaps=False,
+        marker=dict(
+            color='rgba(152, 0, 0, .8)'
+        )
+    )
+
+    opt4 = ['ST_7_3']
+    data4 = r[r.Type.isin(opt4)]
+
+    data4 = data4.loc[data4['STX_7_3'] == 'down']
+    data4 = data4.drop_duplicates('Date')
+
+    trace4 = go.Scatter(
+        y=data4['values'],
+        x=data4['Date'],
+        mode='markers',
+        name='SuperTrend High',
+        connectgaps=False,
+        marker=dict(
+            color='#3D9970'
+        )
+    )
+
+    opt5 = ['ST_7_3']
+    data5 = r[r.Type.isin(opt5)]
+
+    # data5=data4.loc[data4['STX_7_3']=='down']
+    # data4=data4.drop_duplicates('date')
+    # print(data4.head())
+    trace5 = go.Scatter(
+        y=data5['values'],
+        x=data5['Date'],
+        mode='lines',
+        name='SuperTrend',
+        connectgaps=False,
+        marker=dict(
+            color='#3D9970'
+        )
+    )
+
+    opt3 = ['Close']
+    data3 = r[r.Type.isin(opt3)]
+
+    trace3 = go.Scatter(
+        y=data3['values'],
+        x=x,
+        name='Closing price',
+        mode='markers',
+        marker=dict(
+            color='rgb(214, 12, 140)'
+        )
+    )
+
+    data = [trace1, trace2, trace4]
+    layout = go.Layout(title='SperTrend Calculated for '+str(value),
+        yaxis=dict(
+            title='SuperTrend',
+            zeroline=False,
+
+        ), height=800)
+
+    return {'data':data,
+            'layout':layout}
+
 
 
 if __name__ == '__main__':
