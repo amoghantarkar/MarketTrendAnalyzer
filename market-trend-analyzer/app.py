@@ -1,6 +1,8 @@
 from flask import Flask
 
 app = Flask(__name__)
+application=app.server
+
 
  # import DataUpdate
 import pandas as pd
