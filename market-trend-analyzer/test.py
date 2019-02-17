@@ -14,12 +14,12 @@ import quandl
 import time
 import numpy as np
 
-from indicator import EMA, ATR, SuperTrend, MACD, HA, BBand, RSI, Ichimoku
+from trendanalyzer import indicators #import EMA, ATR, SuperTrend, MACD, HA, BBand, RSI, Ichimoku
 
 class Test(unittest.TestCase):
 
     def testIndicators(self):
-        df = quandl.get("NSE/NIFTY_50", api_key = 'fw44D_B2Rv3ZZV-ufqwJ', start_date='1997-01-01')
+        df = quandl.get("NSE/NIFTY_50", api_key = 'E8LGujxYzNsiUWYDPbGF', start_date='1997-01-01')
         df.drop(['Shares Traded', 'Turnover (Rs. Cr)'], inplace=True, axis=1)
     
         def test_EMA(df, colFrom = 'Close', test_period = 5, ignore = 0, forATR=False):
@@ -375,19 +375,19 @@ class Test(unittest.TestCase):
             print('\tSuccess Rate: {}%'.format(round((df['HA_Close_check'].sum() / len(df)) * 100, 2)))
             
         test_EMA(df)
-        test_EMA(df, forATR=True)
-        test_ATR(df)
-        test_SuperTrend(df)
-        test_MACD(df)
-        test_HA(df)
+        #test_EMA(df, forATR=True)
+        #test_ATR(df)
+        #test_SuperTrend(df)
+        #test_MACD(df)
+        #test_HA(df)
         
-        BBand(df)
+        #BBand(df)
         
-        RSI(df)
+        #RSI(df)
         
         Ichimoku(df)
         
-        print(df.head(10))
+        #print(df.head(10))
         print(df.tail(55).to_string())
 
 if __name__ == "__main__":
