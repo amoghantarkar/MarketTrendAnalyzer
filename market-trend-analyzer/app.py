@@ -1,7 +1,7 @@
-from flask import Flask
 
-app = Flask(__name__)
-application=app.server
+
+#app = Flask(__name__)
+
 
 
  # import DataUpdate
@@ -178,6 +178,7 @@ r = pd.melt(r, id_vars=['date','STX_7_3'], var_name='Type', value_name='values')
 #external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__)
+application=app.server
 styles = {
     'pre': {
         'border': 'thin lightgrey solid',
